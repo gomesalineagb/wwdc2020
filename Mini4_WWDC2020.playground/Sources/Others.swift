@@ -9,11 +9,11 @@ struct Constants{
 }
 
 struct Mass{
-    static let small    :CGFloat = 0.05
+    static let small    :CGFloat = 1
     static let middle   :CGFloat = 20
     static let big      :CGFloat = 50
-    static let box      :CGFloat = 20
-    static let movable  :CGFloat = 50
+    static let box      :CGFloat = 40
+    static let movable  :CGFloat = 150
     
 }
 

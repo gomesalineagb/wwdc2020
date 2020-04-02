@@ -15,7 +15,7 @@ public class SmallPlayer: SKSpriteNode,Player{
         self.physicsBody?.collisionBitMask = PhysicCategory.platform | PhysicCategory.bigPlayer | PhysicCategory.middlePlayer | PhysicCategory.box | PhysicCategory.movablePlatform
         self.physicsBody?.mass = Mass.small
         self.physicsBody?.friction = 10
-        self.physicsBody?.restitution = 0
+        self.physicsBody?.restitution = 0.0
         self.addChild(self.light)
 //        self.physicsBody?.usesPreciseCollisionDetection = true
     }

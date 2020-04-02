@@ -14,7 +14,7 @@ public class BigPlayer: SKSpriteNode,Player{
         self.physicsBody?.contactTestBitMask = PhysicCategory.door | PhysicCategory.button
         self.physicsBody?.friction = 1
         self.physicsBody?.velocity.dy = 0
-        self.physicsBody?.restitution = 0
+        self.physicsBody?.restitution = 0.0
 //        self.physicsBody?.usesPreciseCollisionDetection = true
         self.physicsBody?.mass = Mass.big
         self.lightingBitMask = PhysicCategory.light
@@ -39,7 +39,7 @@ public class BigPlayer: SKSpriteNode,Player{
     
     func moveUp() {
         if self.physicsBody?.velocity.dy == 0{
-            self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 18000))
+            self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 18500))
         }
     }
     func moveDown() {

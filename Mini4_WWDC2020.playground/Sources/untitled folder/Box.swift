@@ -12,7 +12,7 @@ public class Box: SKSpriteNode{
         self.lightingBitMask = PhysicCategory.light
         self.physicsBody?.categoryBitMask = PhysicCategory.box
         self.physicsBody?.contactTestBitMask = PhysicCategory.button
-        self.physicsBody?.collisionBitMask = PhysicCategory.bigPlayer | PhysicCategory.middlePlayer | PhysicCategory.smallPlayer | PhysicCategory.platform | PhysicCategory.movablePlatform | PhysicCategory.button
+        self.physicsBody?.collisionBitMask = PhysicCategory.bigPlayer | PhysicCategory.middlePlayer | PhysicCategory.smallPlayer | PhysicCategory.platform | PhysicCategory.movablePlatform
         self.physicsBody?.affectedByGravity = true
         self.physicsBody?.friction = 1
         self.physicsBody?.restitution = 0
