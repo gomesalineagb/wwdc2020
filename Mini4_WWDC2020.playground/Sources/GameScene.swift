@@ -8,24 +8,23 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
     let middlePlayer = MiddlePlayer()
     let bigPlayer = BigPlayer()
     let wall = Wall()
-//    let movablePlatform = SKSpriteNode(imageNamed: "movablePlatform")
     
     var currentPlayer: Player?
-    var currentLevel = 1
+    var currentLevel = 0
     
     var movingRight = false
     var movingLeft = false
     var movingUP = false
     var movingDown = false
     
-    
-    
     override public func didMove(to view: SKView) {
         
         self.physicsWorld.contactDelegate = self
                 
         self.currentPlayer = middlePlayer
-        self.level2()
+        self.currentLevel = 0
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        self.start()
     }
         
     func level1(){
@@ -51,6 +50,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         self.addChild(middlePlayer)
         self.addChild(bigPlayer)
         self.addChild(smallPlayer)
+        self.smallPlayer.addChild(self.smallPlayer.light)
         self.addChild(wall)
         
         self.addChild(door)
@@ -60,7 +60,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
     func level2(){
         
         let platforms = [Platform(txt: SKTexture(imageNamed: "level2Platform1"), pos: CGPoint(x: -72.5, y: -173)),
-                         Platform(txt: SKTexture(imageNamed: "level2Platform2"), pos: CGPoint(x: -302, y: 58)),]
+                         Platform(txt: SKTexture(imageNamed: "level2Platform2"), pos: CGPoint(x: -302, y: 58))]
 
         let door = Door(pos: CGPoint(x: 316.5, y: -151))
         
@@ -85,19 +85,78 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         
         self.addChild(middlePlayer)
         self.addChild(bigPlayer)
+        self.smallPlayer.addChild(self.smallPlayer.light)
         self.addChild(smallPlayer)
         self.addChild(wall)
     }
     
     func level3(){
         
+        let platforms = [Platform(txt: SKTexture(imageNamed: "level3platform1"), pos: CGPoint(x: -204.5, y: -107)),
+                         Platform(txt: SKTexture(imageNamed: "level3platform2"), pos: CGPoint(x: 59.5, y: 10)),
+                         Platform(txt: SKTexture(imageNamed: "level3platform3"), pos: CGPoint(x: 312.5, y: 104))]
+
+        let door = Door(pos: CGPoint(x: 316.5, y: -151))
+        
+        let box = Box(pos: CGPoint(x: 128.5, y: 46))
+        
+        let button = Button(pos: CGPoint(x: 220.5, y: 29))
+        
+        let thinPlatform = ThinPlatform(posInitial: CGPoint(x: 149.5, y: -203), posFinal: CGPoint(x: 149.5, y: -413))
+        thinPlatform.name = "thinPlatform"
+        
+        let movablePlatform = MovablePlatform(pos: CGPoint(x: -113.5, y: 100))
+        
+        self.smallPlayer.position = CGPoint(x: -330, y: -142)
+        self.bigPlayer.position = CGPoint(x: -262, y: -168)
+        self.middlePlayer.position = CGPoint(x: -370, y: -184)
+        
+        for platform in platforms {
+            self.addChild(platform)
+        }
+        self.addChild(door)
+        self.addChild(box)
+        self.addChild(button)
+        self.addChild(thinPlatform)
+        self.addChild(movablePlatform)
+        
+        self.addChild(middlePlayer)
+        self.addChild(bigPlayer)
+        self.smallPlayer.addChild(self.smallPlayer.light)
+        self.addChild(smallPlayer)
+        self.addChild(wall)
     }
     
-    func uploadLevel(level: Int){//remove tudo, e chama o prox nivel
+    func win(){
+        self.start()
+    }
+    
+    func start(){//com label explicando a missao do jogador,e como se joga
+        self.currentLevel += 1
+        self.nextLevel()
+    }
+    
+    func restart(){
+        
+    }
+    
+    func nextLevel(){//remove tudo, e chama o prox nivel
         self.smallPlayer.removeAllChildren()
+        print(currentLevel)
         let transition = SKAction.run {
             self.removeAllChildren()
-            self.level2()
+            switch self.currentLevel {
+            case 1:
+                self.level1()
+            case 2:
+                self.level2()
+            case 3:
+                self.level3()
+            case 4:
+                self.win()
+            default:
+                break
+            }
         }
         
         self.run(.sequence([.wait(forDuration: 2),transition]))
@@ -194,9 +253,10 @@ extension GameScene{
         }
         
         if let door = buttonOrDoor as? Door{
-            let players = door.physicsBody?.allContactedBodies().map({$0.categoryBitMask != PhysicCategory.platform})
+            let players = door.physicsBody?.allContactedBodies().filter({$0.categoryBitMask != PhysicCategory.platform})
+            print(players!.count)
             if players!.count == 3{
-                self.uploadLevel(level: self.currentLevel + 1)
+                self.nextLevel()
             }
         }
     }

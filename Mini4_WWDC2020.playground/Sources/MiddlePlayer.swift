@@ -15,7 +15,7 @@ public class MiddlePlayer: SKSpriteNode,Player{
         self.physicsBody?.collisionBitMask = PhysicCategory.platform | PhysicCategory.bigPlayer | PhysicCategory.smallPlayer | PhysicCategory.box | PhysicCategory.movablePlatform
         self.physicsBody?.friction = 1
         self.physicsBody?.velocity.dy = 0
-        self.physicsBody?.restitution = 0
+        self.physicsBody?.restitution = 0.0
         self.physicsBody?.mass = Mass.middle
         self.lightingBitMask = PhysicCategory.light
         
