@@ -41,3 +41,11 @@ struct PhysicCategory{
     static let bigPlayer:       UInt32 = 0b10000000
     static let light:           UInt32 = 0b100000000
 }
+
+enum GameState: Int{
+    case initial = 0, playing, nextLevel, restart, tutorial
+}
+
+//struct HUDMessages: String{
+//    
+//}

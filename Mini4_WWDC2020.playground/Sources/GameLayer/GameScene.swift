@@ -3,14 +3,30 @@ import SpriteKit
 
 public class GameScene: SKScene,SKPhysicsContactDelegate {
     
+    var hud = HUDLayer()
+
     //player node
     let smallPlayer = SmallPlayer()
     let middlePlayer = MiddlePlayer()
     let bigPlayer = BigPlayer()
     let wall = Wall()
+    let door = Door(pos: CGPoint(x: 316.5, y: -151))
+    var level = SKNode()
     
     var currentPlayer: Player?
-    var currentLevel = 0
+    var currentLevel = 0{
+        didSet{
+            print("level: ",currentLevel)//deu loop
+        }
+    }
+    
+    var gameState: GameState = .initial {
+        didSet {
+            self.updateGameState()
+        }
+    }
+    
+    let arrow = SKSpriteNode(imageNamed: "arrow")
     
     var movingRight = false
     var movingLeft = false
@@ -23,8 +39,13 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
                 
         self.currentPlayer = middlePlayer
         self.currentLevel = 0
-        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        self.start()
+//        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        self.addChild(self.level)
+        self.gameState = .initial
+        self.addChild(wall)
+        self.addChild(self.hud)
+        
+        self.arrow.lightingBitMask = PhysicCategory.light
     }
         
     func level1(){
@@ -35,7 +56,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
                             Platform(txt: SKTexture(imageNamed: "level1Platform3"), pos: CGPoint(x: -95.5, y: 94)),
                             Platform(txt: SKTexture(imageNamed: "level1Platform4"), pos: CGPoint(x: 183.5, y: -156))]
 
-        let door = Door(pos: CGPoint(x: 316.5, y: -151))
+        self.door.position = CGPoint(x: 316.5, y: -151)
         
         let box = Box(pos: CGPoint(x: -74.5, y: 160))
         
@@ -44,17 +65,18 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         self.middlePlayer.position = CGPoint(x: -202, y: -184)
         
         for platform in platforms {
-            self.addChild(platform)
+            self.level.addChild(platform)
         }
+        if self.smallPlayer.light.parent == nil{
+            self.smallPlayer.addChild(self.smallPlayer.light)
+        }
+        self.level.addChild(box)
         
         self.addChild(middlePlayer)
         self.addChild(bigPlayer)
         self.addChild(smallPlayer)
-        self.smallPlayer.addChild(self.smallPlayer.light)
-        self.addChild(wall)
-        
         self.addChild(door)
-        self.addChild(box)
+        self.addChild(arrow)
     }
     
     func level2(){
@@ -62,7 +84,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         let platforms = [Platform(txt: SKTexture(imageNamed: "level2Platform1"), pos: CGPoint(x: -72.5, y: -173)),
                          Platform(txt: SKTexture(imageNamed: "level2Platform2"), pos: CGPoint(x: -302, y: 58))]
 
-        let door = Door(pos: CGPoint(x: 316.5, y: -151))
+        self.door.position = CGPoint(x: 316.5, y: -151)
         
         let box = Box(pos: CGPoint(x: -302.5, y: 96))
         
@@ -76,18 +98,14 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         self.middlePlayer.position = CGPoint(x: -202, y: -184)
         
         for platform in platforms {
-            self.addChild(platform)
+            self.level.addChild(platform)
         }
-        self.addChild(door)
-        self.addChild(box)
-        self.addChild(button)
-        self.addChild(thinPlatform)
-        
-        self.addChild(middlePlayer)
-        self.addChild(bigPlayer)
-        self.smallPlayer.addChild(self.smallPlayer.light)
-        self.addChild(smallPlayer)
-        self.addChild(wall)
+        self.level.addChild(box)
+        self.level.addChild(button)
+        self.level.addChild(thinPlatform)
+        if self.smallPlayer.light.parent == nil{
+            self.smallPlayer.addChild(self.smallPlayer.light)
+        }
     }
     
     func level3(){
@@ -96,7 +114,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
                          Platform(txt: SKTexture(imageNamed: "level3platform2"), pos: CGPoint(x: 59.5, y: 10)),
                          Platform(txt: SKTexture(imageNamed: "level3platform3"), pos: CGPoint(x: 312.5, y: 104))]
 
-        let door = Door(pos: CGPoint(x: 316.5, y: -151))
+        self.door.position = CGPoint(x: 316.5, y: -151)
         
         let box = Box(pos: CGPoint(x: 128.5, y: 46))
         
@@ -112,19 +130,15 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         self.middlePlayer.position = CGPoint(x: -370, y: -184)
         
         for platform in platforms {
-            self.addChild(platform)
+            self.level.addChild(platform)
         }
-        self.addChild(door)
-        self.addChild(box)
-        self.addChild(button)
-        self.addChild(thinPlatform)
-        self.addChild(movablePlatform)
-        
-        self.addChild(middlePlayer)
-        self.addChild(bigPlayer)
-        self.smallPlayer.addChild(self.smallPlayer.light)
-        self.addChild(smallPlayer)
-        self.addChild(wall)
+        self.level.addChild(box)
+        self.level.addChild(button)
+        self.level.addChild(thinPlatform)
+        self.level.addChild(movablePlatform)
+        if self.smallPlayer.light.parent == nil{
+            self.smallPlayer.addChild(self.smallPlayer.light)
+        }
     }
     
     func win(){
@@ -132,35 +146,61 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
     }
     
     func start(){//com label explicando a missao do jogador,e como se joga
-        self.currentLevel += 1
-        self.nextLevel()
+        print("ta no inicio")
     }
     
     func restart(){
+        self.level.removeAllChildren()
+        self.loadLevel()
+    }
+    
+    func tutorial(){
         
     }
     
+    func updateGameState(){
+        switch gameState {
+        case .initial:
+            self.start()
+        case .nextLevel:
+            self.currentLevel += 1
+            self.nextLevel()
+        case .restart:
+            self.restart()
+        case .tutorial:
+            self.tutorial()
+        default:
+            break
+        }
+        self.hud.updateGameState(gameState: gameState, level: self.currentLevel)
+    }
+    
     func nextLevel(){//remove tudo, e chama o prox nivel
+        
         self.smallPlayer.removeAllChildren()
-        print(currentLevel)
         let transition = SKAction.run {
-            self.removeAllChildren()
-            switch self.currentLevel {
-            case 1:
-                self.level1()
-            case 2:
-                self.level2()
-            case 3:
-                self.level3()
-            case 4:
-                self.win()
-            default:
-                break
-            }
+            self.level.removeAllChildren()
+            self.loadLevel()
         }
         
         self.run(.sequence([.wait(forDuration: 2),transition]))
         
+    }
+    
+    func loadLevel(){
+        switch self.currentLevel {
+        case 1:
+            self.level1()
+        case 2:
+            self.level2()
+        case 3:
+            self.level3()
+        case 4:
+            self.gameState = .initial
+            self.currentLevel = 0
+        default:
+            break
+        }
     }
     
     @objc public static override var supportsSecureCoding: Bool {
@@ -170,8 +210,15 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
             return true
         }
     }
-    
-    override public func mouseDown(with event: NSEvent) {
+
+    override public func mouseDown(with event: NSEvent) {//restart, play,
+        let location = event.location(in: self)
+        if self.hud.restart.contains(location){
+            self.gameState = .restart
+        }
+        if self.hud.play.contains(location){
+            self.gameState = .tutorial
+        }
     }
     
     override public func mouseDragged(with event: NSEvent) {
@@ -194,6 +241,7 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
         if movingUP{
             self.currentPlayer?.moveUp()
         }
+        self.arrow.position = CGPoint(x: self.currentPlayer!.position.x, y: self.currentPlayer!.position.y + self.currentPlayer!.size.height)
     }
     
     public override func keyDown(with event: NSEvent) {
@@ -217,6 +265,10 @@ public class GameScene: SKScene,SKPhysicsContactDelegate {
                 self.currentPlayer = smallPlayer
             }else{
                 self.currentPlayer = middlePlayer
+            }
+        case 49://space
+            if self.gameState == .tutorial{
+                self.gameState = .nextLevel
             }
         default:
             break
@@ -256,7 +308,7 @@ extension GameScene{
             let players = door.physicsBody?.allContactedBodies().filter({$0.categoryBitMask != PhysicCategory.platform})
             print(players!.count)
             if players!.count == 3{
-                self.nextLevel()
+                self.gameState = .nextLevel
             }
         }
     }
@@ -269,8 +321,5 @@ extension GameScene{
                 thinPlatform.buttonPressed(pressed: false)
             }
         }
-        
-        
-        
     }
 }
